@@ -2,6 +2,8 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import Components from 'unplugin-vue-components/vite';
+import path from 'path';
 
 export default defineConfig({
   root: __dirname,
@@ -17,7 +19,19 @@ export default defineConfig({
     host: 'localhost',
   },
 
-  plugins: [vue(), nxViteTsPaths()],
+  plugins: [
+    vue(),
+    nxViteTsPaths(),
+    Components({
+      include: [/\.vue$/, /\.vue\?vue/, /\.md$/],
+      dts: 'src/components.d.ts',
+      dirs: [
+        'src/components',
+        path.resolve(__dirname, '../../libs/libcomponents/src/components'),
+        path.resolve(__dirname, '../../libs/libcomponents/src/components/*'),
+      ],
+    }),
+  ],
 
   // Uncomment this if you are using workers.
   // worker: {
@@ -29,21 +43,6 @@ export default defineConfig({
     reportCompressedSize: true,
     commonjsOptions: {
       transformMixedEsModules: true,
-    },
-  },
-
-  test: {
-    globals: true,
-    cache: {
-      dir: '../../node_modules/.vitest',
-    },
-    environment: 'jsdom',
-    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
-
-    reporters: ['default'],
-    coverage: {
-      reportsDirectory: '../../coverage/apps/unplugin-components-monorepo',
-      provider: 'v8',
     },
   },
 });
